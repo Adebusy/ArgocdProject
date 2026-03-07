@@ -1,0 +1,12 @@
+replicaCount: 2
+appName: employeemanagementsystem-react
+appNamespace: employeens
+image:
+  repository: aitsoppe.azurecr.io/react-base-ppe
+  pullPolicy: IfNotPresent
+  pullsecret: image-secret
+  tag: 128
+port: 8092
+targetPort: 3000
+autoSync: true
+appKind: microservice

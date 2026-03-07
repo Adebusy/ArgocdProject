@@ -1,0 +1,13 @@
+# replicaCount: 1
+# appName: sample
+# image:
+#   repository: https://pscode.lioncloud.net/ramalao/gen_ai_apps_onboarding.git
+#   pullPolicy: IfNotPresent
+#   # Overrides the image tag whose default is the chart appVersion.
+#   tag: 30
+# canary: "False"
+# jiraId: test-123
+port: 8080
+# targetPort: 80
+# appKind: "microservice"
+# gatewayName: apps-gateway

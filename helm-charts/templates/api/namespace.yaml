@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    kubernetes.io/metadata.name: "{{ .Values.appNamespace }}"
+    istio.io/rev: "asm-1-17"
+    istio-injection: enabled
+  name: "{{ .Values.appNamespace }}"
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+
+# check update

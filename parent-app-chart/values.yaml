@@ -1,0 +1,7 @@
+namespace: argocd
+targetRevision: GEN-AI-INT-01
+project: default
+appNamespace: mfa
+repoUrl: https://pscode.lioncloud.net/ramalao/gen_ai_apps_onboarding.git
+env:
+  name: pre

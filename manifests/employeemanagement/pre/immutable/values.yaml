@@ -1,0 +1,12 @@
+replicaCount: 2
+appName: employeemanagementsystem
+appNamespace: mfa
+image:
+  repository: aitsoppe.azurecr.io/test-world
+  pullPolicy: IfNotPresent
+  pullsecret: image-secret
+  tag: 15
+port: 8099
+targetPort: 80
+autoSync: false
+appKind: microservice

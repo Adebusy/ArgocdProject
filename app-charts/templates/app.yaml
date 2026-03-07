@@ -1,0 +1,36 @@
+{{- range .Values.appList }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: "{{ . }}"
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+         - cluster: int
+           url:  https://kubernetes.default.svc
+           revision: GEN-AI-INT-01
+  template:
+    metadata:
+    # -{{ $.Values.appNamespace }}
+      name: "{{"{{"}}cluster{{"}}"}}-{{ . }}"
+    spec:
+      source:
+        repoURL: {{ $.Values.repoUrl }}
+        targetRevision: '{{"{{"}}revision{{"}}"}}'
+        path: helm-charts
+        helm:
+         valueFiles:
+          - "/manifests/{{ . }}/{{ $.Values.env.name }}/immutable/values.yaml"
+      project: "default"
+      syncPolicy:
+        syncOptions:
+        - CreateNamespace=true
+      automated:
+        selfHeal: false
+      destination:
+        server: '{{"{{"}}url{{"}}"}}'
+        namespace: {{ $.Values.appNamespace }}
+{{- end }}    

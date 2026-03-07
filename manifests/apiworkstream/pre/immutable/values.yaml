@@ -1,0 +1,26 @@
+appName: auth-ui-dev
+appNamespace: api-ns
+image:
+  repository: aitsoppe.azurecr.io/api-auth-dev-ui #argocdtestcr.azurecr.io/testservice
+  pullPolicy: IfNotPresent
+  pullsecret: aitsoppe
+  tag: 408
+port: 80
+targetPort: 80
+autoSync: true
+appKind: microservice
+appType: web # web, api,...
+appVersion: v1
+secret:
+  name: ""
+# appKind: db
+# args:
+#   - "--requirepass"
+#   - "your-redis-password"
+# # appKind: db
+# env:          
+#  USERNAME: "test"
+#  PASWORD: "testpassword"
+
+# configMap:
+#   name: configmapname

@@ -1,0 +1,28 @@
+{{- if eq (.Values.appKind | toString) "microservice" }}
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: vs-{{ .Values.appName }}
+  namespace: default
+spec:
+ hosts:
+  - "*" #domain name of the platform
+ gateways:
+  - bookinfo-gateway
+ http:
+ - match:
+   - uri:
+      # prefix: "/{{ .Values.appType }}/{{ .Values.appVersion }}/{{ .Values.appName }}"
+      {{- if eq (.Values.appType | toString) "api" }}
+       prefix: "/{{ .Values.appType }}/{{ .Values.appVersion }}/{{ .Values.appName }}"
+      {{- else if eq (.Values.appType | toString) "web" }}
+       prefix: "/{{ .Values.appType }}/{{ .Values.appName }}"
+      {{- end }}
+   rewrite:
+      uri: "/"
+   route:
+   - destination:
+      host: "serv-{{ .Values.appName }}.{{ .Values.appNamespace }}.svc.cluster.local"
+      port:
+        number: {{ .Values.port }}
+{{- end }}

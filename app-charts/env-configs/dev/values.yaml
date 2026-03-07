@@ -1,0 +1,7 @@
+env:
+  name: dev
+appList:
+# - librarymanagementsystem
+# - employeemanagement
+- apiworkstream
+# - media-workstream

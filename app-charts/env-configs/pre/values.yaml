@@ -1,0 +1,9 @@
+env:
+  name: pre
+appList:
+# - librarymanagementsystem
+# - employeemanagement
+# - mysql
+# - rtlpropagation-sb
+- apiworkstream
+# - dataworkstream

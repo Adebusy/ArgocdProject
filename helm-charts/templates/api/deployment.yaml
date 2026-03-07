@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: "{{ .Values.appName }}"
+  name: {{ .Values.appName }}-deployment
+  namespace: "{{ .Values.appNamespace }}"
+spec:
+  selector:
+    matchLabels:
+      app: "{{ .Values.appName }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.appName }}"
+    spec:
+      containers:
+        # - image: "{{ .Values.image.repository }}"
+        - image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          name: "{{ .Values.appName }}"
+          ports:
+            - containerPort : {{ .Values.targetPort }}
+          env:
+          {{- if eq (.Values.appKind | toString) "db" }}
+           - name: MYSQL_ROOT_PASSWORD
+             valueFrom:
+              secretKeyRef:
+                  key: MYSQL_ROOT_PASSWORD
+                  name: {{ .Values.appName }}-secret
+           - name: MYSQL_DATABASE
+             valueFrom:
+              configMapKeyRef:
+                  key: MYSQL_DATABASE
+                  name: {{ .Values.appName }}-cm
+          {{- end }}
+          {{- range $key, $val := .Values.env }}
+           - name: {{ $key }}
+             value: {{ $val | quote }}
+          {{- end }}
+          args:          
+            {{  range .Values.args }}
+              - {{ . }}
+            {{ end }}
+          {{ if not (quote .Values.secret.name | empty)  }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secret.name }}
+          {{ end }}
+      imagePullSecrets:
+       - name: "{{ .Values.image.pullsecret }}"

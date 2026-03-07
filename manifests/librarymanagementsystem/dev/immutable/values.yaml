@@ -1,0 +1,12 @@
+replicaCount: 2
+appNamespace: libraryns
+appName: librarymanagementsystem
+image:
+  repository: aitsoppe.azurecr.io/test-world
+  pullPolicy: IfNotPresent
+  pullsecret: image-secret
+  tag: 15
+port: 8095
+targetPort: 80
+autoSync: false
+appKind: microservice

@@ -1,0 +1,26 @@
+appName: apimanagementsystem-frontend
+appNamespace: api
+image:
+  repository: tsosharedapi.azurecr.io/tso-auth-dev #argocdtestcr.azurecr.io/testservice
+  pullPolicy: IfNotPresent
+  pullsecret: tsosharedapi
+  tag: 313
+port: 80
+targetPort: 80
+autoSync: true
+appKind: microservice
+appType: web # web, api,...
+appVersion: v1
+# appKind: db
+args:
+  - "--requirepass"
+  - "your-redis-password"
+# appKind: db
+env:          
+ USERNAME: "test"
+ PASWORD: "testpassword"
+secret:
+  name: auth-dev-env
+
+configMap:
+  name: configmapname
