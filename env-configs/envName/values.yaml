@@ -1,0 +1,97 @@
+workstreamapps:
+  apiworkstream:
+    - api-asset.yaml
+    - api-assistants.yaml
+    - api-auth-v2.yaml
+    - api-configservice.yaml
+    - api-dataservice.yaml
+    - api-embeddings.yaml
+    - api-llm.yaml
+    #- api-llmguard.yaml
+    - api-oauth.yaml
+    - api-portal-v2.yaml
+    - api-project-v2.yaml
+    #- api-project.yaml
+    - api-userprofile.yaml
+    - api-wrapper.yaml
+    - api-stateservice.yaml
+    - api-llmtrack.yaml
+    # - api-configservice-ui.yaml
+    - api-notification.yaml
+    - api-events.yaml
+    - api-workflow.yaml
+    - api-graph.yaml
+    - api-realtime.yaml
+    - api-moderation.yaml
+    - api-project-v3.yaml
+  dataworkstream:
+    - data-aggregate-insights.yaml
+    # - data-dictionary.yaml
+    - data-taxonomy.yaml
+    - data-persist-cohort-service.yaml
+    - data-discovery-sync-service.yaml
+    - data-cluster-evaluation-service.yaml
+    - data-job-checker-service.yaml
+    - data-dictionary-service.yaml
+    - data-housekeeping-postgres-service.yaml
+  contentworkstream:
+    - coreai-mlr.yaml
+    - mlr-svc.yaml
+    - gcr-rule-svc.yaml
+    - gcr-event-manager.yaml
+  coreaiworkstream:
+    - coreai-alx-service.yaml
+    - coreai-file-manager-service.yaml
+    - coreai-host.yaml
+    - coreai-project-management.yaml
+    - coreai-data-insights-service.yaml
+    - coreai-workflow-builder.yaml
+    - coreai-event-hub-manager.yaml
+    - coreai-notification-service.yaml
+    - utility-blocks-previewer.yaml
+    - utility-blocks-data-sense.yaml
+    - coreai-af-utility-service.yaml
+    - coreai-context-plane-service.yaml
+    - coreai-context-plane-mcp-server.yaml
+    - coreai-discovery-mcp-server.yaml
+    - coreai-discovery-service.yaml
+    - v3-agent-as-code.yaml
+    - coreai-host-v3.yaml
+    - coreai-file-manager-service-v2.yaml
+  sustainworkstream:
+    - mock-auth.yaml
+    - mock-auth-ui.yaml
+  audworkstream:
+    - aga-service.yaml
+    - audience-service.yaml
+    - audience-views.yaml
+    - audience-mcp-server.yaml
+  autoworkstream:
+    - nba-backend.yaml
+    - nba-ui.yaml
+  bodhiworkstream:
+    - bodhi-atomize-celery-worker.yaml
+    - bodhi-atomize-fast-api.yaml
+    - bodhi-compliance-celery-worker.yaml
+    - bodhi-compliance-fast-api.yaml
+    - bodhi-kaas-attribute-extract.yaml
+    - bodhi-kaas-summary-extract.yaml
+    - bodhi-recommend.yaml
+    - bodhi-insights-coreai.yaml
+    - bodhi-audience-chat-agent.yaml
+    - bodhi-insights-query-builder.yaml
+    - bodhi-atomize-v2-celery-worker.yaml
+    - bodhi-atomize-v2-fast-api.yaml
+
+  utilitiesworkstream:
+    - release-management-ui.yaml
+    - release-management-api.yaml
+    - models-metadata-utils.yaml
+    - api-configservice-ui.yaml
+    - coreai-orch-api.yaml
+    - catalog-app.yaml
+    - catalog-svc.yaml
+    - catalog-indexer.yaml
+    - consumption-data-ingestion.yaml
+    - consumption-portal-ui.yaml
+    - consumption-portal.yaml
