@@ -1,0 +1,14 @@
+{{- if eq .Values.usekeda true }}
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: {{ .Values.image.repository }}-triggerauthentication
+  namespace: {{ .Values.appNamespace }}-ns
+spec:
+  secretTargetRef:
+    {{- range .Values.keda.TriggerAuthentication.secretTargetRef }}
+    - parameter: {{ .parameter }}
+      name: {{ $.Values.image.repository }}
+      key: {{ .key }}
+    {{- end }}
+{{- end }}
