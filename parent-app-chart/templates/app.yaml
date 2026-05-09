@@ -12,12 +12,13 @@ spec:
     helm:
       valueFiles:
       - "./env-configs/{{ .Values.env.name }}/values.yaml"
+      - "/parent-app-chart/values.yaml"
   destination:
     server: "https://kubernetes.default.svc"
-    namespace: {{ $.Values.appNamespace }}
+    namespace: "mfa"
   syncPolicy:
     syncOptions:
-      - CreateNamespace=true  
+      - "sync-interval=600s"
     automated:
-      prune: true
+      prune: false
       selfHeal: true
