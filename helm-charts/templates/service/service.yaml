@@ -1,16 +1,21 @@
+{{- if or (eq .Values.appKind "microservice") (eq .Values.appKind "web")  }}
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: "{{ .Values.appName }}"
-  name: "serv-{{ .Values.appName }}"
-  namespace: "{{ .Values.appNamespace }}"
+    app: "{{ .Values.image.repository }}"
+  name: "{{ .Values.image.repository }}-svc"
+  namespace: "{{ .Values.appNamespace }}-ns"
 spec:
   ports:
-  - port: {{ .Values.port }}
+  {{- range $v := .Values.targetports }}
+  - name: {{ $v.name }}
+    port: {{ $v.value }}
     protocol: TCP
-    targetPort: {{ .Values.targetPort }}
+    targetPort: {{ $v.value }}
+  {{- end }}
   selector:
-    app: "{{ .Values.appName }}"
+    app: "{{ .Values.image.repository }}"
   sessionAffinity: None
   type: ClusterIP
+{{- end }}
