@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/instance: argo-cd
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: argocd-rbac-cm
+    app.kubernetes.io/part-of: argocd
+    app.kubernetes.io/version: v2.11.2
+    argocd.argoproj.io/instance: apponboarding
+    helm.sh/chart: argo-cd-7.0.0
+    k8slens-edit-resource-version: v1
+    meta.helm.sh/release-name: argo-cd
+    meta.helm.sh/release-namespace: argocd
+  managedFields: 
+    - manager: terraform-provider-helm_v2.14.0_x5
+      operation: Update
+      apiVersion: v1
+      time: '2024-07-04T09:08:29Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:data:
+          .: {}
+          f:policy.default: {}
+          f:policy.matchMode: {}
+          f:scopes: {}
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:meta.helm.sh/release-name: {}
+            f:meta.helm.sh/release-namespace: {}
+          f:labels:
+            .: {}
+            f:app.kubernetes.io/component: {}
+            f:app.kubernetes.io/instance: {}
+            f:app.kubernetes.io/managed-by: {}
+            f:app.kubernetes.io/name: {}
+            f:app.kubernetes.io/part-of: {}
+            f:app.kubernetes.io/version: {}
+            f:helm.sh/chart: {}
+    - manager: node-fetch
+      operation: Update
+      apiVersion: v1
+      time: '2024-09-04T16:41:48Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:labels:
+            f:k8slens-edit-resource-version: {}
+    - manager: argocd-controller
+      operation: Update
+      apiVersion: v1
+      time: '2024-10-24T09:00:39Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:data:
+          f:policy.csv: {}
+        f:metadata:
+          f:annotations:
+            f:kubectl.kubernetes.io/last-applied-configuration: {}
+          f:labels:
+            f:argocd.argoproj.io/instance: {}
+  selfLink: /api/v1/namespaces/argocd/configmaps/argocd-rbac-cm
+data:
+  policy.csv: >-
+    p, role:readwrite, applications, get, */*, allow
+
+    p, role:syncapp, applications, sync, */*, allow
+
+    p, role:syncapp, applications, get,
+    contentworkstream-int-centralus/*, allow
+
+    p, role:syncapp, applications, create,
+    contentworkstream-int-centralus/*, allow
+
+    p, role:syncapp, applications, delete,
+    contentworkstream-int-centralus/*, allow
+
+    p, bodhiuser, applications, get, bodhiworkstream-int-centralus/*, allow
+    p, bodhiuser, applications, sync, bodhiworkstream-int-centralus/*, allow
+    p, bodhiuser, projects, get, bodhiworkstream-int-centralus/*, allow
+    p, bodhiuser, applications, action/apps/Deployment/restart, bodhiworkstream-int-centralus/*, allow
+
+    g, gcrsync, role:syncapp
+    
+    g, intreader, role:readwrite
+  policy.default: ''
+  policy.matchMode: glob
+  scopes: '[groups]'
