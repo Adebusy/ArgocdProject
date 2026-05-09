@@ -1,0 +1,37 @@
+{{- if or .Values.usejobkeda .Values.usekeda }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  {{- if .Values.usejobkedadev2 }}
+  name: {{ .Values.appName }}-scaledobject
+  {{- else }}
+  name: {{ .Values.image.repository }}-scaledobject
+  {{- end }}
+  {{- if .Values.usejobkeda }}
+  namespace: {{ .Values.appNamespaceJob }}-ns
+  {{- else }}
+  namespace: {{ .Values.appNamespace }}-ns
+  {{- end }}
+spec:
+  scaleTargetRef:
+    {{- if .Values.usejobkedadev2 }}
+    name: {{ .Values.appName }}-deployment
+    {{- else }}
+    name: {{ .Values.image.repository }}-deployment
+    {{- end }}
+    kind: Deployment
+  pollingInterval: {{ .Values.keda.ScaledObject.pollingInterval }}
+  cooldownPeriod: {{ .Values.keda.ScaledObject.cooldownPeriod }}
+  minReplicaCount: {{ .Values.keda.ScaledObject.minReplicaCount }}
+  maxReplicaCount: {{ .Values.keda.ScaledObject.maxReplicaCount }}
+  triggers:
+    - type: {{ .Values.keda.ScaledObject.trigger.type }}
+      metadata:
+        {{- range $key, $value := .Values.keda.ScaledObject.trigger.metadata }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+      {{- if not .Values.usejobkeda }}
+      authenticationRef:
+        name: {{ $.Values.image.repository }}-triggerauthentication
+      {{- end }}
+{{- end }}
