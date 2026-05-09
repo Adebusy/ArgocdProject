@@ -1,36 +1,48 @@
-{{- range .Values.appList }}
+{{- range $key, $values := .Values.workstreamapps -}}
+{{- range $value := $values -}}
 ---
+{{ $filename := split "." $value }}
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: "{{ . }}"
+  name: "{{ $key }}-{{ $filename._0 }}"
   namespace: argocd
 spec:
   generators:
     - list:
         elements:
          - cluster: int
-           url:  https://kubernetes.default.svc
+           url: https://kubernetes.default.svc
            revision: GEN-AI-INT-01
   template:
     metadata:
-    # -{{ $.Values.appNamespace }}
-      name: "{{"{{"}}cluster{{"}}"}}-{{ . }}"
+      name: "{{"{{"}}cluster{{"}}"}}-{{ $key }}-{{ $filename._0 }}"
     spec:
-      source:
-        repoURL: {{ $.Values.repoUrl }}
-        targetRevision: '{{"{{"}}revision{{"}}"}}'
-        path: helm-charts
-        helm:
-         valueFiles:
-          - "/manifests/{{ . }}/{{ $.Values.env.name }}/immutable/values.yaml"
-      project: "default"
+      sources:
+       - repoURL: {{ $.Values.repoUrl }}
+         targetRevision: '{{"{{"}}revision{{"}}"}}'
+         path: helm-charts
+         helm:
+          valueFiles:
+          - $manifestrepo/manifests/{{ $key }}/{{ $.Values.env.name }}/immutable/{{ $value }}
+          - "/app-charts/env-configs/int/values.yaml"
+          - "/parent-app-chart/values.yaml"
+       - repoURL: 'https://pscode.lioncloud.net/coreai-platform-team/coreai-apps-mainfest.git'
+         targetRevision: GEN-AI-INT-01
+         ref: manifestrepo
+      targetRevision: HEAD
+      ref: values
+      project: "{{ $key }}-{{"{{"}}cluster{{"}}"}}-{{ $.Values.env.region }}"
       syncPolicy:
+        {{- if or (eq $key "audworkstream") (eq $key "dataworkstream") }}
+        automated:
+          selfHeal: true
+          prune: true
+        {{- end }}
         syncOptions:
-        - CreateNamespace=true
-      automated:
-        selfHeal: false
+          - CreateNamespace=false
       destination:
         server: '{{"{{"}}url{{"}}"}}'
         namespace: {{ $.Values.appNamespace }}
-{{- end }}    
+{{ end -}}
+{{- end -}}
