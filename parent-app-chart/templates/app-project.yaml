@@ -1,0 +1,23 @@
+{{- range .Values.workstreams }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{ . }}-{{ $.Values.env.name }}-{{ $.Values.env.region }}
+  namespace: argocd
+spec:
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  description: {{ . }}-{{ $.Values.env.name }}-{{ $.Values.env.region }}
+  sourceRepos:
+    - "https://pscode.lioncloud.net/coreai-platform-team/coreai-platform-apps-onboarding.git"
+    - "https://pscode.lioncloud.net/coreai-platform-team/coreai-apps-mainfest.git"
+  destinations:
+    - name: "*"
+      namespace: "*"
+      server: "https://kubernetes.default.svc"
+{{- end }}
