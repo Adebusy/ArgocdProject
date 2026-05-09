@@ -1,50 +1,157 @@
+{{- if or (eq .Values.appKind "microservice") (eq .Values.appKind "web") }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: "{{ .Values.appName }}"
-  name: {{ .Values.appName }}-deployment
-  namespace: "{{ .Values.appNamespace }}"
+    app: {{ .Values.image.repository }}
+  name: {{ .Values.image.repository }}-deployment
+  namespace: {{ .Values.appNamespace }}-ns
 spec:
+  replicas: {{ default 1 .Values.replicas }}
   selector:
     matchLabels:
-      app: "{{ .Values.appName }}"
+      app: {{ .Values.image.repository }}
   template:
     metadata:
       labels:
-        app: "{{ .Values.appName }}"
+        app: {{ .Values.image.repository }}
     spec:
+      volumes:
+        {{- if eq .Values.mountVolume true }}
+        - name: {{ .Values.image.repository }}-volume
+          configMap:
+            name: {{ .Values.image.repository }}-cm
+            defaultMode: 420
+        {{- end }}
+        # {{- if eq .Values.enableSideCar true }}
+        # - name: shared
+        #   emptyDir: {}
+        # {{- end }}
+
       containers:
-        # - image: "{{ .Values.image.repository }}"
-        - image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          name: "{{ .Values.appName }}"
+        - image: "{{ .Values.containerregistry.name }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          name: {{ .Values.image.repository }}
           ports:
-            - containerPort : {{ .Values.targetPort }}
-          env:
-          {{- if eq (.Values.appKind | toString) "db" }}
-           - name: MYSQL_ROOT_PASSWORD
-             valueFrom:
-              secretKeyRef:
-                  key: MYSQL_ROOT_PASSWORD
-                  name: {{ .Values.appName }}-secret
-           - name: MYSQL_DATABASE
-             valueFrom:
-              configMapKeyRef:
-                  key: MYSQL_DATABASE
-                  name: {{ .Values.appName }}-cm
+          {{- range $v := .Values.targetports }}
+            - containerPort : {{ $v.value }}
           {{- end }}
+          resources:
+            requests:
+              cpu: {{ default "100m" (.Values.resources).requests.cpu }}
+              memory: {{ default "100Mi" (.Values.resources).requests.memory }}
+            limits:
+              cpu: {{ default "100m" (.Values.resources).limits.cpu }}
+              memory: {{ default "100Mi" (.Values.resources).limits.memory }}
+          # {{- if .Values.enablePostStartHook }}
+          # lifecycle:
+          #     postStart:
+          #       exec:
+          #           command: ["/bin/sh", "-c", "printenv | grep -E '^(BRANCH_NAME|TAG|COMMIT_ID|SERVICE_VERSION|DEPLOY_TIME|BUILD_TIME)=' > /tmp/shared/env.list"]
+          # {{- end }}
+    
+          volumeMounts:
+          {{- if eq .Values.mountVolume true }}  
+           - name: {{ .Values.image.repository }}-volume
+             mountPath: {{ .Values.image.repository }}
+          {{- end }}
+          # {{- if eq .Values.enableSideCar true }}   
+          #  - name: shared
+          #    mountPath: /tmp/shared
+          # {{- end }}
+
+          env:
           {{- range $key, $val := .Values.env }}
            - name: {{ $key }}
              value: {{ $val | quote }}
           {{- end }}
+          {{- range $key, $val := .Values.EnvironmentVariableSecret }}
+           - name: {{ $val }}
+             valueFrom: 
+               secretKeyRef:
+                name: {{ $key }}
+                key: {{ $val }}
+          {{- end }}
+          {{- if (.Values.args) }}
           args:          
             {{  range .Values.args }}
-              - {{ . }}
+             - {{ . }}
             {{ end }}
-          {{ if not (quote .Values.secret.name | empty)  }}
+          {{- end }}
+          {{- if (.Values.secrets) }}
           envFrom:
+           {{- if eq .Values.deployConfigMap true }}
+            - configMapRef:
+                name: {{ .Values.image.repository }}-cm
+           {{- end }}
             - secretRef:
-                name: {{ .Values.secret.name }}
-          {{ end }}
-      imagePullSecrets:
-       - name: "{{ .Values.image.pullsecret }}"
+                name: {{ .Values.image.repository }}
+          {{- end }}
+          {{- if (.Values.livenessProbe) }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.livenessProbe.path }}
+              port: {{ .Values.livenessProbe.port }}
+            initialDelaySeconds: {{ default 30 .Values.livenessProbe.initialDelaySeconds }}  #30
+            periodSeconds: {{ default 30 .Values.livenessProbe.periodSeconds }}  #30
+            timeoutSeconds: {{ default 5 .Values.livenessProbe.timeoutSeconds }}  #5
+          {{- end }}
+          {{- if (.Values.readinessProbe) }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.readinessProbe.path }}
+              port: {{ .Values.readinessProbe.port }}
+              scheme: HTTP
+            initialDelaySeconds: {{ default 30 .Values.readinessProbe.initialDelaySeconds }}  #30
+            periodSeconds: {{ default 30 .Values.readinessProbe.periodSeconds }}  #30
+            timeoutSeconds: {{ default 5 .Values.readinessProbe.timeoutSeconds }}  #5
+          {{- end }}
+      
+      
+      # {{- if .Values.enableSideCar }}
+      #   - image: "acrintcusclient0shared.azurecr.io/app-registration-service:3195"
+      #     name: "sidecar"
+      #     command: ["/bin/sh", "-c"]
+      #     args:
+      #       - |
+      #         sleep 1
+      #         echo "Waiting for main container to be ready..."
+      #         while [ ! -f /tmp/shared/env.list ]; do
+      #           echo "Waiting for file to get created"
+      #           sleep 2
+      #         done
+
+      #         export $(grep -v '^#' /tmp/shared/env.list | xargs)
+      #         echo "Sidecar starting script execution..."
+      #         python /app/register_service.py
+      #         touch /tmp/shared/sidecar-complete
+      #         echo "Sidecar completed its task"
+      #         tail -f /dev/null
+      #     {{- if eq .Values.enableSideCar true }}
+      #     volumeMounts:
+      #       - name: shared
+      #         mountPath: /tmp/shared
+      #     {{- end }}
+      #     env:
+      #       {{- range $key, $val := .Values.env }}
+      #       - name: {{ $key }}
+      #         value: {{ $val | quote }}
+      #       {{- end }}
+      #       - name: CLIENT_AUTH
+      #         valueFrom:
+      #           secretKeyRef:
+      #             name: {{ .Values.image.repository }}-sidecar
+      #             key: CLIENT_AUTH
+      #       - name: APP_KEY
+      #         valueFrom:
+      #           secretKeyRef:
+      #             name: {{ .Values.image.repository }}-sidecar
+      #             key: APP_KEY
+      #     resources:
+      #       requests:
+      #         cpu: {{ (.Values.resources).requests.cpu | default "10m" | quote }}
+      #         memory: {{ (.Values.resources).requests.memory | default "10Mi" | quote }}
+      #       limits:
+      #         cpu: {{ (.Values.resources).limits.cpu | default "100m" | quote }}
+      #         memory: {{ (.Values.resources).limits.memory | default "100Mi" | quote }}
+      # {{- end }}
+{{- end }}
