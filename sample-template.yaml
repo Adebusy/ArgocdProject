@@ -1,0 +1,29 @@
+appName: deployment_name
+appNamespace: application_namespace
+image:
+  repository: aitsoppe.azurecr.io/api-auth #argocdtestcr.azurecr.io/testservice
+  pullsecret: aitsoppe
+  tag: 2162
+port: 8080
+targetPort: 8080
+appKind: microservice, db
+virtualServiceName: virtualservicename #/api/v1/auth/
+rewritetorootpath: true #this instruct argo CD to re-route request to rootpath
+secret:
+  name: api-auth
+args:
+  - "--requirepass"
+env:          
+  envkey : envvalue
+secrets:
+  secretkey: secretvalue
+configMap:
+  name: configmapname
+resources: {}
+resources:
+  limits:
+    memory: 512Mi
+    cpu: 100m
+  requests:
+     memory: 512Mi
+     cpu: 100m
